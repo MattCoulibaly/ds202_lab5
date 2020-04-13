@@ -1,0 +1,47 @@
+---
+title: "team"
+author: "Matthew Coulibaly Github: MattCoulibaly"
+date: "4/12/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+acc <- read.csv("https://raw.githubusercontent.com/xdaiISU/ds202materials/master/hwlabs/fars2017/accident.csv", stringsAsFactors = FALSE)
+per <- read.csv("https://raw.githubusercontent.com/xdaiISU/ds202materials/master/hwlabs/fars2017/person.csv", stringsAsFactors = FALSE)
+```
+
+```{r}
+# Question 1
+table(acc$DAY_WEEK)
+```
+# Day 7 of the week has the most accidents in the dataframe with 5873 accidents. The next closes days are day 1 and day 6 with 5360 and 5358 accidents respectively. The rest of the days have less than 4700 accidents.
+
+```{r}
+# Question 2
+barplot(table(acc$HOUR))
+```
+
+# Most accidents in this dataframe occur between hour 17 and hour 22.
+
+```{r}
+# Question 3
+nrow(acc[acc$DRUNK_DR >= 1,])
+```
+# There were 8769 accidents with at least one drunk driver in this dataframe
+
+```{r}
+# Question 4
+per1 = per[per$PER_TYP == 1,]
+
+# Question 5
+
+
+# Question 6
+
+
+# Question 7 & 8
+
+
+# Question 9
+```
