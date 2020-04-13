@@ -1,6 +1,6 @@
 ---
 title: "team"
-author: "Matthew Coulibaly Github: MattCoulibaly"
+author: "Matthew Coulibaly Github: MattCoulibaly Jessie Bustin Github:jebustin"
 date: "4/12/2020"
 output: html_document
 ---
@@ -9,6 +9,8 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 acc <- read.csv("https://raw.githubusercontent.com/xdaiISU/ds202materials/master/hwlabs/fars2017/accident.csv", stringsAsFactors = FALSE)
 per <- read.csv("https://raw.githubusercontent.com/xdaiISU/ds202materials/master/hwlabs/fars2017/person.csv", stringsAsFactors = FALSE)
+library("dplyr")
+library("ggplot2")
 ```
 
 ```{r}
@@ -33,12 +35,33 @@ nrow(acc[acc$DRUNK_DR >= 1,])
 ```{r}
 # Question 4
 per1 = per[per$PER_TYP == 1,]
+```
 
+```{r}
 # Question 5
+merge <- left_join(per, acc, by = "ST_CASE")
+```
 
-
+```{r}
 # Question 6
+merge <- merge %>%
+  filter(HOUR.x, HOUR.x < 25) %>%
+  filter(SEX, SEX <= 2) %>%
+  mutate(SEX = as.factor(SEX)) %>%
+  mutate(DAY_WEEK = as.factor(DAY_WEEK))
 
+levels(merge$SEX) <- c("Male", "Female")
+levels(merge$DAY_WEEK) <- c("Sunday", "Monday", "Tuesday",
+                            "Wednesday", "Thursday", "Friday",
+                            "Saturday")
+
+merge %>%
+  group_by(DAY_WEEK, HOUR.x, SEX) %>%
+  summarize(count = length(unique(ST_CASE))) %>%
+  ggplot(aes(x = HOUR.x, y = count, color = SEX)) +
+  geom_line() +
+  facet_wrap(~DAY_WEEK)
+```
 
 # Question 7 & 8
 
