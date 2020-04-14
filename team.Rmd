@@ -11,35 +11,37 @@ acc <- read.csv("https://raw.githubusercontent.com/xdaiISU/ds202materials/master
 per <- read.csv("https://raw.githubusercontent.com/xdaiISU/ds202materials/master/hwlabs/fars2017/person.csv", stringsAsFactors = FALSE)
 library("dplyr")
 library("ggplot2")
+library(tidyverse)
 ```
 
 ```{r}
 # Question 1
 table(acc$DAY_WEEK)
 ```
-# Day 7 of the week has the most accidents in the dataframe with 5873 accidents. The next closes days are day 1 and day 6 with 5360 and 5358 accidents respectively. The rest of the days have less than 4700 accidents.
+Day 7 of the week has the most accidents in the dataframe with 5873 accidents. The next closes days are day 1 and day 6 with 5360 and 5358 accidents respectively. The rest of the days have less than 4700 accidents.
 
 ```{r}
 # Question 2
 barplot(table(acc$HOUR))
 ```
 
-# Most accidents in this dataframe occur between hour 17 and hour 22.
+Most accidents in this dataframe occur between hour 17 and hour 22.
 
 ```{r}
 # Question 3
 nrow(acc[acc$DRUNK_DR >= 1,])
 ```
-# There were 8769 accidents with at least one drunk driver in this dataframe
+There were 8769 accidents with at least one drunk driver in this dataframe
 
 ```{r}
 # Question 4
 per1 = per[per$PER_TYP == 1,]
 ```
+PER_TYP is a categorical variable describing the person's role in the accident.  This coding changed throughout the reporting years slightly, but type 1 has always been for the driver.
 
 ```{r}
 # Question 5
-merge <- left_join(per, acc, by = "ST_CASE")
+merge <- left_join(per1, acc, by = "ST_CASE")
 ```
 
 ```{r}
@@ -60,11 +62,123 @@ merge %>%
   summarize(count = length(unique(ST_CASE))) %>%
   ggplot(aes(x = HOUR.x, y = count, color = SEX)) +
   geom_line() +
-  facet_wrap(~DAY_WEEK)
+  facet_wrap(~DAY_WEEK) +
+  ggtitle("Tracking the Number of Accidents Over 24 Hours By Day of
+          the Week") +
+  xlab("Hour")
 ```
+The above chart shows the cyclical nature of car accedents.  During the week days (M-F) there seems to be a small spike around the morning commute and then growth through the evening hours.  On Friday and Saturday nights the evening increase continues through the late night and into the early hours of the following day.  Don't drink and drive!
 
+```{r}
 # Question 7 & 8
+GLCS <- readxl::read_xlsx("FRPP GLC - United StatesFeb132020.xlsx")
 
+names(GLCS)[names(GLCS) == "State Code"] <- "STATE"
+names(GLCS)[names(GLCS) == "County Code"] <- "COUNTY"
 
-# Question 9
+GLCS <- GLCS %>%
+  mutate(STATE = as.numeric(STATE)) %>%
+  mutate(COUNTY = as.numeric(COUNTY))
+
+names(GLCS)[names(GLCS) == "State Name"] <- "region"
+names(GLCS)[names(GLCS) == "County Name"] <- "subregion"
+
+GLCS <- GLCS %>%
+  mutate(region = tolower(region)) %>%
+  mutate(subregion = tolower(subregion))
+
+counties <- map_data('county')
+
+acc1 <- acc %>%
+  group_by(STATE, COUNTY) %>%
+  summarize(count = n())
+  
+loc <- left_join(counties, GLCS, by = c("region" = "region", 
+                                   "subregion" = "subregion"))
+
+loc <- left_join(loc, acc1, by = c("STATE" = "STATE", 
+                                   "COUNTY" = "COUNTY"))
+
+loc %>%
+ggplot(aes(x = long, y = lat, fill = log(count))) + 
+  geom_polygon(aes(group=group)) +
+  ggtitle("Number of Accidents by County") 
+  ##coord_map()
 ```
+
+```{r}
+# Question 9
+acc2 <- acc %>%
+  filter(STATE %in% c(1,2,3,4,5,6,7,8,9)) %>%
+  group_by(STATE, MONTH) %>%
+  summarize(count = n())
+
+acc3 <- acc %>%
+  filter(STATE %in% c(10,11,12,13,14,15,16,17,18)) %>%
+  group_by(STATE, MONTH) %>%
+  summarize(count = n())
+
+acc4 <- acc %>%
+  filter(STATE %in% c(19,20,21,22,23,24,25,26,27)) %>%
+  group_by(STATE, MONTH) %>%
+  summarize(count = n())
+
+acc5 <- acc %>%
+  filter(STATE %in% c(28,29,30,31,32,33,34,35,36)) %>%
+  group_by(STATE, MONTH) %>%
+  summarize(count = n())
+
+acc6 <- acc %>%
+  filter(STATE %in% c(37,38,39,40,41,42,43,44,45)) %>%
+  group_by(STATE, MONTH) %>%
+  summarize(count = n())
+
+acc7 <- acc %>%
+  filter(STATE %in% c(46,47,48,49,54,55,56)) %>%
+  group_by(STATE, MONTH) %>%
+  summarize(count = n())
+
+left_join(acc2, GLCS) %>%
+  ggplot(aes(x = MONTH, y = count)) +
+  geom_line() +
+  facet_wrap(~region)
+
+left_join(acc3, GLCS) %>%
+  ggplot(aes(x = MONTH, y = count)) +
+  geom_line() +
+  facet_wrap(~region)
+
+left_join(acc4, GLCS) %>%
+  ggplot(aes(x = MONTH, y = count)) +
+  geom_line() +
+  facet_wrap(~region)
+
+left_join(acc5, GLCS) %>%
+  ggplot(aes(x = MONTH, y = count)) +
+  geom_line() +
+  facet_wrap(~region)
+
+left_join(acc6, GLCS) %>%
+  ggplot(aes(x = MONTH, y = count)) +
+  geom_line() +
+  facet_wrap(~region)
+
+left_join(acc7, GLCS) %>%
+  ggplot(aes(x = MONTH, y = count)) +
+  geom_line() +
+  facet_wrap(~region)
+```
+
+Different states have different seasons where the number of accidents is highest.  Some states, such as Ohio peak in the summer when there are more cars and people out and about.  Other states, such as North Carolina have more accidents in the late fall and this could be due to a change in weather and thus driving conditions.  Others, such as as Louisiana seem to peek during the spring months and this could be due to spring break travelers in New Orleans.  Each state has its own trend across the months.  Let's look at the US as a whole to check if there is a yearly trend.
+
+```{r}
+acc %>%
+  group_by(MONTH) %>%
+  summarize(count = n()) %>%
+  ggplot(aes(x = MONTH, y = count)) +
+  geom_line() +
+  ggtitle("US Accidents Per Month")
+```
+
+Across the US the most dangerous month on the road is July and the safest is February.  This is due to the number of cars on the road during these months.  While this holds true for the US overall, some individual states vary from the trend.
+
