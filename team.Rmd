@@ -9,6 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 acc <- read.csv("https://raw.githubusercontent.com/xdaiISU/ds202materials/master/hwlabs/fars2017/accident.csv", stringsAsFactors = FALSE)
 per <- read.csv("https://raw.githubusercontent.com/xdaiISU/ds202materials/master/hwlabs/fars2017/person.csv", stringsAsFactors = FALSE)
+GLCS <- readxl::read_xlsx("FRPP GLC - United StatesFeb132020.xlsx")
 library("dplyr")
 library("ggplot2")
 library(tidyverse)
@@ -25,7 +26,7 @@ Day 7 of the week has the most accidents in the dataframe with 5873 accidents. T
 # Question 2
 ggplot(acc, aes(HOUR)) +
   geom_bar(fill = "#0073C2FF") +
-  xlim(0, 24)
+  xlim(0, 24) + ggtitle("Number of accidents per hour")
 ```
 
 Most accidents in this dataframe occur between hour 17 and hour 22.
@@ -74,8 +75,6 @@ The above chart shows the cyclical nature of car accedents.  During the week day
 
 ```{r}
 # Question 7 & 8
-GLCS <- readxl::read_xlsx("FRPP GLC - United StatesFeb132020.xlsx")
-
 names(GLCS)[names(GLCS) == "State Code"] <- "STATE"
 names(GLCS)[names(GLCS) == "County Code"] <- "COUNTY"
 
