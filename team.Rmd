@@ -22,7 +22,9 @@ Day 7 of the week has the most accidents in the dataframe with 5873 accidents. T
 
 ```{r}
 # Question 2
-barplot(table(acc$HOUR))
+ggplot(acc, aes(HOUR)) +
+  geom_bar(fill = "#0073C2FF") +
+  xlim(0, 24)
 ```
 
 Most accidents in this dataframe occur between hour 17 and hour 22.
