@@ -12,6 +12,7 @@ per <- read.csv("https://raw.githubusercontent.com/xdaiISU/ds202materials/master
 library("dplyr")
 library("ggplot2")
 library(tidyverse)
+library(mapproj)
 ```
 
 ```{r}
@@ -104,8 +105,8 @@ loc <- left_join(loc, acc1, by = c("STATE" = "STATE",
 loc %>%
 ggplot(aes(x = long, y = lat, fill = log(count))) + 
   geom_polygon(aes(group=group)) +
-  ggtitle("Number of Accidents by County") 
-  ##coord_map()
+  ggtitle("Number of Accidents by County") +
+  coord_map()
 ```
 
 ```{r}
